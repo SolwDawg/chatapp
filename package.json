@@ -5,7 +5,9 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "prepare": "husky"
+        "prepare": "husky",
+        "lint": "eslint --ext .ts,.tsx,.js,.jsx resources/js",
+        "test": "vitest"
     },
     "devDependencies": {
         "@commitlint/cli": "^20.0.0",
