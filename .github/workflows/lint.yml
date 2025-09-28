@@ -1,0 +1,78 @@
+name: Lint (Laravel + React)
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          extensions: mbstring, intl, pdo_mysql, bcmath, pcntl, curl, dom, fileinfo, json, xml
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install PHP deps (with dev)
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18'
+          cache: npm
+
+      - name: Install Node deps (if present)
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json, skipping npm ci"
+          fi
+
+      # ----- PHP lint/style/analyse (tùy chọn nhưng nên bật) -----
+      - name: Laravel Pint
+        run: |
+          if [ -f vendor/bin/pint ]; then
+            vendor/bin/pint --test
+          else
+            echo "Pint not installed, skipping."
+          fi
+
+      - name: PHPStan
+        run: |
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse --no-progress
+          else
+            echo "PHPStan not installed, skipping."
+          fi
+
+      # ----- JS/TS lint -----
+      - name: ESLint
+        run: npm run lint --if-present
+
+      - name: Type check
+        run: npm run typecheck --if-present
+
+      - name: Prettier check
+        run: npm run format:check --if-present
