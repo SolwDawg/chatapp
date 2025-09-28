@@ -1,0 +1,56 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^20.0.0",
+        "@commitlint/config-conventional": "^20.0.0",
+        "@eslint/js": "^9.36.0",
+        "@headlessui/react": "^2.2.9",
+        "@inertiajs/react": "^2.0.0",
+        "@laravel/echo-react": "^2.2.3",
+        "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-react": "^4.2.0",
+        "autoprefixer": "^10.4.12",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "eslint": "^9.36.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-import": "^2.32.0",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^5.2.0",
+        "laravel-echo": "^2.2.3",
+        "laravel-vite-plugin": "^2.0.0",
+        "lint-staged": "^16.2.0",
+        "postcss": "^8.4.31",
+        "prettier": "^3.6.2",
+        "pusher-js": "^8.4.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "tailwindcss": "^3.2.1",
+        "vite": "^7.0.4"
+    },
+    "dependencies": {
+        "@heroicons/react": "^2.2.0",
+        "daisyui": "^5.1.20",
+        "emoji-picker-react": "^4.13.3",
+        "husky": "^9.1.7",
+        "react-markdown": "^10.1.0",
+        "uuid": "^13.0.0"
+    },
+    "lint-staged": {
+        "**/*.{js,jsx,ts,tsx}": [
+            "eslint --max-warnings=0",
+            "prettier --write"
+        ],
+        "**/*.{html,json,css,scss,md,mdx}": [
+            "prettier -w"
+        ]
+    }
+}
