@@ -7,7 +7,9 @@
         "dev": "vite",
         "prepare": "husky",
         "lint": "eslint --ext .ts,.tsx,.js,.jsx resources/js",
-        "test": "vitest"
+        "test": "vitest",
+        "typecheck": "tsc --noEmit",
+        "format:check": "prettier -c \"resources/**/*.{js,jsx,ts,tsx,vue,css,scss,md}\""
     },
     "devDependencies": {
         "@commitlint/cli": "^20.0.0",

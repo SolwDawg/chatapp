@@ -51,13 +51,14 @@ jobs:
           fi
 
       # ----- PHP lint/style/analyse (tùy chọn nhưng nên bật) -----
-     # - name: Laravel Pint
-      #  run: |
-       #   if [ -f vendor/bin/pint ]; then
-        #    vendor/bin/pint --test
-        #  else
-        #    echo "Pint not installed, skipping."
-        #  fi
+
+  #    - name: Laravel Pint
+  #      run: |
+  #        if [ -f vendor/bin/pint ]; then
+  #          vendor/bin/pint --test
+  #        else
+  #          echo "Pint not installed, skipping."
+  #        fi
 
       - name: PHPStan
         run: |
