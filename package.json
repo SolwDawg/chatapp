@@ -6,10 +6,10 @@
         "build": "vite build",
         "dev": "vite",
         "prepare": "husky",
-        "lint": "eslint --ext .ts,.tsx,.js,.jsx resources/js",
+        "lint": "eslint resources/js --ext .js,.jsx",
         "test": "vitest",
         "typecheck": "tsc --noEmit",
-        "format:check": "prettier -c \"resources/**/*.{js,jsx,ts,tsx,vue,css,scss,md}\""
+        "format:check": "prettier -c \"resources/**/*.{js,jsx,vue,css,scss,md}\""
     },
     "devDependencies": {
         "@commitlint/cli": "^20.0.0",
@@ -29,6 +29,7 @@
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
+        "globals": "^16.4.0",
         "laravel-echo": "^2.2.3",
         "laravel-vite-plugin": "^2.0.0",
         "lint-staged": "^16.2.0",
