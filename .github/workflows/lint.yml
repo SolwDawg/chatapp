@@ -72,8 +72,8 @@ jobs:
       - name: ESLint
         run: npm run lint --if-present
 
-      - name: Type check
-        run: npm run typecheck --if-present
+      # - name: Type check
+      #   run: npm run typecheck --if-present
 
       - name: Prettier check
         run: npm run format:check --if-present

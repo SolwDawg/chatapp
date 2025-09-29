@@ -1,14 +1,14 @@
-import { useForm } from "@inertiajs/react";
+import { useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
-        email: "",
+        email: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route("password.email"));
+        post(route('password.email'));
     };
 
     return (
@@ -35,7 +35,7 @@ export default function ForgotPassword({ status }) {
                     value={data.email}
                     className="mt-1 block w-full"
                     isFocused={true}
-                    onChange={(e) => setData("email", e.target.value)}
+                    onChange={(e) => setData('email', e.target.value)}
                 />
 
                 <InputError message={errors.email} className="mt-2" />
