@@ -1,5 +1,3 @@
-import { Link } from '@inertiajs/react';
-
 export default function ResponsiveNavLink({
     active = false,
     className = '',
