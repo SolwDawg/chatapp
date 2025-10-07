@@ -1,4 +1,10 @@
+import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
+
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
