@@ -1,19 +1,50 @@
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from 'react';
 
+import MessageInput from '@/Components/App/MessageInput';
+import ConversationHeader from '@/Components/ConversationHeader';
+import { useEventBus } from '@/EventBus';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import ChatLayout from '@/Layouts/ChatLayout';
 
 function Home({ messages = null, selectedConversation = null }) {
     const [localMessages, setLocalMessages] = useState([]);
     const messagesCtrRef = useRef(null);
+    const { on } = useEventBus();
 
     useEffect(() => {
+        const messageCreated = (message) => {
+            if (
+                selectedConversation &&
+                selectedConversation.is_group &&
+                selectedConversation.id === message.group_id
+            ) {
+                setLocalMessages((prevMessages) => [message, ...prevMessages]);
+            }
+
+            if (
+                selectedConversation &&
+                selectedConversation.is_user &&
+                (selectedConversation.id === message.receiver_id ||
+                    selectedConversation.id === message.sender_id)
+            ) {
+                setLocalMessages((prevMessages) => [message, ...prevMessages]);
+            }
+        };
+
         setTimeout(() => {
-            messagesCtrRef.current.scrollTop =
-                messagesCtrRef.current.scrollHeight;
+            if (messagesCtrRef.current) {
+                messagesCtrRef.current.scrollTop =
+                    messagesCtrRef.current.scrollHeight;
+            }
         }, 10);
-    }, [selectedConversation]);
+
+        const offCreated = on('message.created', messageCreated);
+
+        return () => {
+            offCreated();
+        };
+    }, [selectedConversation, on]);
 
     useEffect(() => {
         setLocalMessages(messages ? messages.data.reverse() : []);
