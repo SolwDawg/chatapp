@@ -1,4 +1,4 @@
-import { Fragment, Transition } from '@headlessui/react';
+import { Menu, Transition } from '@headlessui/react';
 import {
     EllipsisVerticalIcon,
     LockClosedIcon,
@@ -7,7 +7,7 @@ import {
     UserIcon,
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import Menu from 'daisyui/components/menu';
+import { Fragment } from 'react';
 
 export default function UserOptionsDropdown({ conversation }) {
     const changeUserRole = () => {

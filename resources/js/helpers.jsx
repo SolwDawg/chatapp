@@ -19,6 +19,17 @@ export const formatMessageDateLong = (date) => {
     }
 };
 
+export const formatMessageDateShort = (date) => {
+    const inputDate = new Date(date);
+
+    if (isToday(inputDate)) {
+        return inputDate.toLocaleDateString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    }
+};
+
 export const isToday = (date) => {
     const today = new Date();
     return (

@@ -1,3 +1,4 @@
+import { Popover } from '@headlessui/react';
 import {
     FaceSmileIcon,
     HandThumbUpIcon,
@@ -15,6 +16,10 @@ const MessageInput = ({ conversation = null }) => {
     const [messageSending, setMessageSending] = useState(false);
 
     const onSendClick = () => {
+        if (messageSending) {
+            return;
+        }
+
         if (newMessage.trim() === '') {
             setInputErrorMessage('Message is required');
 
@@ -32,6 +37,7 @@ const MessageInput = ({ conversation = null }) => {
         }
 
         setMessageSending(true);
+
         axios
             .post(route('messages.store'), formData, {
                 onUploadProgress: (progressEvent) => {
@@ -50,6 +56,24 @@ const MessageInput = ({ conversation = null }) => {
                 console.log(err);
                 setMessageSending(false);
             });
+    };
+
+    const onLikeClick = () => {
+        if (messageSending) {
+            return;
+        }
+
+        const data = {
+            message: '👍',
+        };
+
+        if (conversation.is_user) {
+            data['receiver_id'] = conversation.id;
+        } else if (conversation.is_group) {
+            data['group_id'] = conversation.id;
+        }
+
+        axios.post(route('messages.store'), data);
     };
 
     return (
@@ -82,6 +106,7 @@ const MessageInput = ({ conversation = null }) => {
                     />
                     <button
                         onClick={onSendClick}
+                        disabled={messageSending}
                         className="btn btn-info rounded-l-none"
                     >
                         {messageSending && (
@@ -96,10 +121,23 @@ const MessageInput = ({ conversation = null }) => {
                 )}
             </div>
             <div className="xs:order-3 order-3 flex p-2">
-                <button className="p-1 text-gray-400 hover:text-gray-300">
-                    <FaceSmileIcon className="h-6 w-6" />
-                </button>
-                <button className="p-1 text-gray-400 hover:text-gray-300">
+                <Popover className="relative">
+                    <Popover.Button className="p-1 text-gray-400 hover:text-gray-300">
+                        <FaceSmileIcon className="h-6 w-6" />
+                    </Popover.Button>
+                    <Popover.Panel className="absolute bottom-full right-0 z-10">
+                        <EmojiPicker
+                            theme="dark"
+                            onEmojiClick={(ev) =>
+                                setNewMessage(newMessage + ev.emoji)
+                            }
+                        />
+                    </Popover.Panel>
+                </Popover>
+                <button
+                    onClick={onLikeClick}
+                    className="p-1 text-gray-400 hover:text-gray-300"
+                >
                     <HandThumbUpIcon className="h-6 w-6" />
                 </button>
             </div>

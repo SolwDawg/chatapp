@@ -2,8 +2,10 @@ import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+import ConversationItem from '@/Components/App/ConversationItem';
 import TextInput from '@/Components/TextInput';
 import echo from '@/echo';
+import { useEventBus } from '@/EventBus';
 
 const ChatLayout = ({ children }) => {
     const page = usePage();
@@ -13,10 +15,9 @@ const ChatLayout = ({ children }) => {
     const [sortedConversations, setSortedConversations] = useState([]);
     selectedConversation;
     const [onlineUsers, setOnlineUsers] = useState({});
+    const { on } = useEventBus();
 
     const isUserOnline = (userId) => onlineUsers[userId];
-
-    console.log(selectedConversation);
 
     const onSearch = (ev) => {
         const search = ev.target.value.toLowerCase();
@@ -28,6 +29,41 @@ const ChatLayout = ({ children }) => {
             ),
         );
     };
+
+    const messageCreated = (message) => {
+        setLocalConversations((oldUsers) => {
+            return oldUsers.map((u) => {
+                if (
+                    message.receiver_id &&
+                    !u.is_group &&
+                    (u.id == message.receiver_id || u.id == message.sender_id)
+                ) {
+                    u.last_message = message.message;
+                    u.last_message_date = message.created_at;
+                    return u;
+                }
+
+                if (
+                    message.group_id &&
+                    u.is_group &&
+                    u.id == message.group_id
+                ) {
+                    u.last_message = message.message;
+                    u.last_message_date = message.created_at;
+                    return u;
+                }
+
+                return u;
+            });
+        });
+    };
+
+    useEffect(() => {
+        const offCreated = on('message.created', messageCreated);
+        return () => {
+            offCreated();
+        };
+    }, [on]);
 
     useEffect(() => {
         setSortedConversations(
