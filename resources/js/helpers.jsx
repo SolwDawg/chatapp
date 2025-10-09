@@ -48,3 +48,46 @@ export const isYesterday = (date) => {
         date.getFullYear() === yesterday.getFullYear()
     );
 };
+
+export const isImage = (attachment) => {
+    let mime = attachment.mime || attachment.type;
+    mime = mime.split('/');
+    return mime[0].toLowerCase() === 'image';
+};
+
+export const isVideo = (attachment) => {
+    let mime = attachment.mime || attachment.type;
+    mime = mime.split('/');
+    return mime[0].toLowerCase() === 'video';
+};
+
+export const isPDF = (attachment) => {
+    let mime = attachment.mime || attachment.type;
+    return mime === 'application/pdf';
+};
+
+export const isAudio = (attachment) => {
+    let mime = attachment.mime || attachment.type;
+    mime = mime.split('/');
+    return mime[0].toLowerCase() === 'audio';
+};
+
+export const isPreviewable = (attachment) => {
+    return (
+        isImage(attachment) ||
+        isVideo(attachment) ||
+        isPDF(attachment) ||
+        isAudio(attachment)
+    );
+};
+
+export const formatBytes = (bytes, decimals = 2) => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+};

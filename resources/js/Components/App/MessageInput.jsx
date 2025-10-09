@@ -5,22 +5,48 @@ import {
     PaperAirplaneIcon,
     PaperClipIcon,
     PhotoIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import EmojiPicker from 'emoji-picker-react';
 import { useState } from 'react';
 
+import AttachmentPreview from './AttachmentPreview';
+import AudioRecorder from './AudioRecorder';
+import CustomAudioPlayer from './CustomAudioPlayer';
 import NewMessageInput from './NewMessageInput';
+
+import { isAudio, isImage } from '@/helpers';
+
 const MessageInput = ({ conversation = null }) => {
     const [newMessage, setNewMessage] = useState('');
     const [inputErrorMessage, setInputErrorMessage] = useState('');
     const [messageSending, setMessageSending] = useState(false);
+    const [chosenFiles, setChosenFiles] = useState([]);
+    const [uploadProgress, setUploadProgress] = useState(0);
+
+    const onFileChange = (ev) => {
+        const files = ev.target.files;
+
+        const updatedFiles = [...files].map((file) => {
+            return {
+                file: file,
+                url: URL.createObjectURL(file),
+            };
+        });
+        ev.target.value = null;
+
+        setChosenFiles((prevFiles) => {
+            return [...prevFiles, ...updatedFiles];
+        });
+    };
 
     const onSendClick = () => {
         if (messageSending) {
             return;
         }
 
-        if (newMessage.trim() === '') {
+        if (newMessage.trim() === '' && chosenFiles.length === 0) {
             setInputErrorMessage('Message is required');
 
             setTimeout(() => {
@@ -29,6 +55,9 @@ const MessageInput = ({ conversation = null }) => {
             return;
         }
         const formData = new FormData();
+        chosenFiles.forEach((file) => {
+            formData.append('attachments[]', file.file);
+        });
         formData.append('message', newMessage);
         if (conversation.is_user) {
             formData.append('receiver_id', conversation.id);
@@ -45,16 +74,22 @@ const MessageInput = ({ conversation = null }) => {
                         (progressEvent.loaded / progressEvent.total) * 100,
                     );
                     console.log(progress);
+                    setUploadProgress(progress);
                 },
             })
             .then((res) => {
                 console.log(res);
                 setNewMessage('');
                 setMessageSending(false);
+                setUploadProgress(0);
+                setChosenFiles([]);
             })
             .catch((err) => {
                 console.log(err);
                 setMessageSending(false);
+                setChosenFiles([]);
+                const message = err?.response?.data?.message;
+                setInputErrorMessage(message || 'Something went wrong');
             });
     };
 
@@ -76,6 +111,10 @@ const MessageInput = ({ conversation = null }) => {
         axios.post(route('messages.store'), data);
     };
 
+    const recordedAudioReady = (file, url) => {
+        setChosenFiles((prevFiles) => [...prevFiles, { file, url }]);
+    };
+
     return (
         <div className="flex flex-wrap items-start border-t border-slate-700 py-3">
             <div className="xs:flex-none xs:order-1 order-2 flex-1 p-2">
@@ -85,6 +124,7 @@ const MessageInput = ({ conversation = null }) => {
                         type="file"
                         className="absolute bottom-0 left-0 right-0 top-0 z-20 cursor-pointer opacity-0"
                         multiple
+                        onChange={onFileChange}
                     />
                 </button>
                 <button className="relative p-1 text-gray-400 hover:text-gray-300">
@@ -94,8 +134,10 @@ const MessageInput = ({ conversation = null }) => {
                         className="absolute bottom-0 left-0 right-0 top-0 z-20 cursor-pointer opacity-0"
                         accept="image/*"
                         multiple
+                        onChange={onFileChange}
                     />
                 </button>
+                <AudioRecorder fileReady={recordedAudioReady} />
             </div>
             <div className="xs:p-0 xs:basis-0 xs:order-2 relative order-1 min-w-[220px] flex-1 basis-full px-3">
                 <div className="flex">
@@ -116,9 +158,59 @@ const MessageInput = ({ conversation = null }) => {
                         <span className="hidden sm:inline">Send</span>
                     </button>
                 </div>
+                {!!uploadProgress && (
+                    <progress
+                        className="progress progress-info w-full"
+                        value={uploadProgress}
+                        max={100}
+                    />
+                )}
                 {inputErrorMessage && (
                     <p className="text-xs text-red-400">{inputErrorMessage}</p>
                 )}
+                <div className="mt-2 flex flex-wrap gap-1">
+                    {chosenFiles.map((file) => (
+                        <div
+                            key={file.file.name}
+                            className={
+                                `relative flex cursor-pointer justify-between ` +
+                                (!isImage(file.file) ? ' w-[240px]' : '')
+                            }
+                        >
+                            {isImage(file.file) && (
+                                <img
+                                    src={file.url}
+                                    alt=""
+                                    className="h-16 w-16 object-cover"
+                                />
+                            )}
+                            {isAudio(file.file) && (
+                                <CustomAudioPlayer
+                                    file={file}
+                                    showVolume={false}
+                                />
+                            )}
+
+                            {!isAudio(file.file) && !isImage(file.file) && (
+                                <AttachmentPreview file={file} />
+                            )}
+
+                            <button
+                                onClick={() =>
+                                    setChosenFiles(
+                                        chosenFiles.filter(
+                                            (f) =>
+                                                f.file.name !== file.file.name,
+                                        ),
+                                    )
+                                }
+                                className="absolute -right-2 -top-2 z-10 h-6 w-6 rounded-full bg-gray-800 text-gray-300 hover:text-gray-100"
+                            >
+                                <XCircleIcon className="w-6" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className="xs:order-3 order-3 flex p-2">
                 <Popover className="relative">
