@@ -115,8 +115,25 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not authorized to delete this message'], 403);
         }
 
+        $group = null;
+        $conversation = null;
+
+        if ($message->group_id) {
+            $group = Group::where('last_message_id', $message->id)->first();
+        } else {
+            $conversation = Conversation::where('last_message_id', $message->id)->first();
+        }
+
         $message->delete();
 
-        return response()->json(['message' => 'Message deleted successfully'], 204);
+        if ($group) {
+            $group = Group::find($group->id);
+            $lastMessage = $group->lastMessage;
+        } else if ($conversation) {
+            $conversation = Conversation::find($conversation->id);
+            $lastMessage = $conversation->lastMessage;
+        }
+
+        return response()->json(['message' => $lastMessage ? new MessageResource($lastMessage) : null]);
     }
 }

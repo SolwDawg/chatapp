@@ -57,11 +57,20 @@ const ChatLayout = ({ children }) => {
             });
         });
     };
-
     useEffect(() => {
+        const messageDeleted = (prevMessage) => {
+            if (!prevMessage) {
+                return;
+            }
+
+            messageCreated(prevMessage);
+        };
+
         const offCreated = on('message.created', messageCreated);
+        const offDeleted = on('message.deleted', messageDeleted);
         return () => {
             offCreated();
+            offDeleted();
         };
     }, [on]);
 
