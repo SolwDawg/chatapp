@@ -51,6 +51,16 @@ export default function AuthenticatedLayout({ header, children }) {
                             `Shared ${message.attachments.length === 1 ? 'an file' : `${message.attachments.length} attachments`}`,
                     });
                 });
+
+            if (conversation.is_group) {
+                echo.private(`group.deleted.${conversation.id}`)
+                    .listen('GroupDeleted', (e) => {
+                        emit('group.deleted', { id: e.id, name: e.name });
+                    })
+                    .error((error) => {
+                        console.error(error);
+                    });
+            }
         });
 
         return () => {
@@ -67,6 +77,10 @@ export default function AuthenticatedLayout({ header, children }) {
                 }
 
                 echo.leave(channel);
+
+                if (conversation.is_group) {
+                    echo.leave(`group.deleted.${conversation.id}`);
+                }
             });
         };
     }, [conversations, emit, user]);
