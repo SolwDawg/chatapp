@@ -16,6 +16,7 @@ import AudioRecorder from './AudioRecorder';
 import CustomAudioPlayer from './CustomAudioPlayer';
 import NewMessageInput from './NewMessageInput';
 
+import { useEventBus } from '@/EventBus';
 import { isAudio, isImage } from '@/helpers';
 
 const MessageInput = ({ conversation = null }) => {
@@ -24,6 +25,7 @@ const MessageInput = ({ conversation = null }) => {
     const [messageSending, setMessageSending] = useState(false);
     const [chosenFiles, setChosenFiles] = useState([]);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const { emit } = useEventBus();
 
     const onFileChange = (ev) => {
         const files = ev.target.files;
@@ -42,6 +44,7 @@ const MessageInput = ({ conversation = null }) => {
     };
 
     const onSendClick = () => {
+        emit('toast.show', 'Message sent successfully');
         if (messageSending) {
             return;
         }
